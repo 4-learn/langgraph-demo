@@ -83,15 +83,26 @@ if __name__ == "__main__":
     )
     print(f"  嚴重程度：{result['severity']}")
     print(f"  歷程：{result['messages']}")
-    print(f"  → 暫停中，等待主管審核...\n")
+    print(f"  → Graph 已暫停，send_alert 還沒跑\n")
 
-    # Step 2：主管審核
-    print("=== Step 2：主管核准 ===")
-    app.update_state(config, {"messages": ["主管已核准"]})
-    print("  → 已更新 State\n")
+    # Step 2：主管審核（手動放行）
+    print("=== Step 2：主管審核 ===")
+    choice = input("  核准發送告警？(y/n): ").strip().lower()
 
-    # Step 3：繼續執行
-    print("=== Step 3：繼續執行 ===")
-    result = app.invoke(None, config=config)
-    print(f"  狀態：{result['status']}")
-    print(f"  歷程：{result['messages']}")
+    if choice == "y":
+        app.update_state(config, {"messages": ["主管已核准"]})
+        print("  → 核准，繼續執行\n")
+
+        # Step 3：繼續執行
+        print("=== Step 3：繼續執行 ===")
+        result = app.invoke(None, config=config)
+        print(f"  狀態：{result['status']}")
+        print(f"  歷程：{result['messages']}")
+    else:
+        app.update_state(config, {"status": "rejected", "messages": ["主管已拒絕"]})
+        print("  → 拒絕，流程結束\n")
+
+        # 取得最終狀態
+        state = app.get_state(config)
+        print(f"  狀態：{state.values['status']}")
+        print(f"  歷程：{state.values['messages']}")
