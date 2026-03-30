@@ -191,8 +191,8 @@ def my_node(state):
     return {"result": "processed"}
 
 # 2. LLM Chain
-from langchain_openai import ChatOpenAI
-llm = ChatOpenAI()
+from langchain_google_genai import ChatGoogleGenerativeAI
+llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
 graph.add_node("llm", llm)  # 直接加入 LLM
 
 # 3. Tool
